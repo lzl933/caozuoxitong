@@ -7,7 +7,10 @@ mod lang_items;
 mod sbi;
 mod syscall;
 mod trap;
-mod batch;
+mod loader;
+mod config;
+mod task;
+mod timer;
 
 use core::arch::global_asm;
 
@@ -25,46 +28,12 @@ fn clear_bss() {
 
 #[unsafe(no_mangle)]
 pub fn rust_main() -> ! {
-    unsafe extern "C" {
-        fn stext();
-        fn etext();
-        fn srodata();
-        fn erodata();
-        fn sdata();
-        fn edata();
-        fn sbss();
-        fn ebss();
-        fn boot_stack();
-        fn boot_stack_top();
-    }
     clear_bss();
-    println!("[Kernel] Hello, world!");
-    println!(
-        ".text [{:#x}, {:#x})",
-        stext as *const () as usize,
-        etext as *const () as usize
-    );
-    println!(
-        ".rodata [{:#x}, {:#x})",
-        srodata as *const () as usize,
-        erodata as *const () as usize
-    );
-    println!(
-        ".data [{:#x}, {:#x})",
-        sdata as *const () as usize,
-        edata as *const () as usize
-    );
-    println!(
-        "boot_stack [{:#x}, {:#x})",
-        boot_stack as *const () as usize,
-        boot_stack_top as *const () as usize
-    );
-    println!(
-        ".bss [{:#x}, {:#x})",
-        sbss as *const () as usize,
-        ebss as *const () as usize
-    );
+    println!("[kernel] Hello, world!");
     trap::init();
-    batch::init();
-    batch::run_next_app();
+    loader::load_apps();
+    trap::enable_timer_interrupt();
+    timer::set_next_trigger();
+    task::run_first_task();
+    panic!("Unreachable in rust_main!");
 }

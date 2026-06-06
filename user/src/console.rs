@@ -1,4 +1,5 @@
 use core::fmt::{self, Write};
+
 use super::write;
 
 const STDOUT: usize = 1;

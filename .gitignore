@@ -1,3 +1,4 @@
-﻿**/target/
+**/target/
 os/src/link_app.S
-
+vendor/
+docker-cargo/
