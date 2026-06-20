@@ -27,7 +27,8 @@ pub fn sys_read(fd: usize, buf: *const u8, len: usize) -> isize {
             let mut c: usize;
             loop {
                 c = console_getchar();
-                if c == 0 {
+                // OpenSBI: 无输入时返回 -1；RustSBI: 返回 0
+                if c == 0 || c == usize::MAX {
                     suspend_current_and_run_next();
                     continue;
                 } else {
